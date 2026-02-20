@@ -16,7 +16,7 @@ import { RateLimiter } from './middlewares/rate-limit';
 // ======================================
 import healthRouter from './shared/health/health.route';
 import uploadRouter from './shared/upload/upload.route';
-
+import authRouter from './modules/auth/auth.routes';
 // ======================================
 // ⭐️ 환경 설정
 // ======================================
@@ -44,11 +44,11 @@ app.use(
 // ⭐️ 라우터 등록 (추가시 여기에)
 // ======================================
 // Shared Routes
-app.use('/health', healthRouter);
-app.use('/upload', uploadRouter);
+app.use('/api/health', healthRouter);
+app.use('/api/upload', uploadRouter);
 
 // Domain Routes
-
+app.use('/api/auth', authRouter);
 // ======================================
 // ⭐️ 에러 핸들링
 // ======================================

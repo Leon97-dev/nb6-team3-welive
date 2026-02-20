@@ -2,7 +2,7 @@
 @base = http://localhost:3000
 
 ### 서버 상태 확인
-GET {{base}}/health
+GET {{base}}/api/health
 
 ### 데이터베이스 상태 확인  
-GET {{base}}/health/db
+GET {{base}}/api/health/db
