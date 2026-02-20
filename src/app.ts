@@ -44,8 +44,8 @@ app.use(
 // ⭐️ 라우터 등록 (추가시 여기에)
 // ======================================
 // Shared Routes
-app.use('/health', healthRouter);
-app.use('/upload', uploadRouter);
+app.use('/api/health', healthRouter);
+app.use('/api/upload', uploadRouter);
 
 // Domain Routes
 
