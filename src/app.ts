@@ -10,12 +10,14 @@ import { corsOptions } from './config/cors';
 import { errorHandler, notFoundHandler } from './middlewares/error-handler';
 import { requestIdMiddleware } from './middlewares/requestId';
 import { RateLimiter } from './middlewares/rate-limit';
+import { optionalAuth } from './middlewares/auth';
 
 // ======================================
 // ⭐️ 도메인 라우터 등록 (추가시 여기에)
 // ======================================
 import healthRouter from './shared/health/health.route';
 import uploadRouter from './shared/upload/upload.route';
+import authRouter from './modules/auth/auth.routes';
 
 // ======================================
 // ⭐️ 환경 설정
@@ -33,6 +35,7 @@ app.use(cookieParser());
 // Cross-Cutting Middleware
 app.use(requestIdMiddleware);
 app.use(RateLimiter);
+app.use(optionalAuth);
 
 // Static Files
 app.use(
@@ -48,6 +51,7 @@ app.use('/api/health', healthRouter);
 app.use('/api/upload', uploadRouter);
 
 // Domain Routes
+app.use('/api/auth', authRouter);
 
 // ======================================
 // ⭐️ 에러 핸들링

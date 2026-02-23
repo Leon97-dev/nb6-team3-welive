@@ -1,0 +1,18 @@
+### 환경 설정
+@base = http://localhost:3000
+
+### 회원가입
+POST {{base}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "nelda591231",
+  "password": "evqs0qpZxV6SmNx",
+  "contact": "01084950608",
+  "name": "황지효",
+  "email": "deven.s2312@hotmail.com",
+  "role": "ADMIN",
+  "apartmentName": "위리브 1단지",
+  "apartmentDong": "132",
+  "apartmentHo": "308"
+}
