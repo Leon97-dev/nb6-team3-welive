@@ -71,7 +71,7 @@ export const requireAuth = (
 };
 
 // 2) 역할 기반 접근 제어 미들웨어 (인증된 사용자 중 특정 역할만 접근 허용, 권한 부족 시 403 Forbidden 에러 반환)
-export const requireRole =
+export const requireRoles =
   (...roles: Role[]) =>
   (req: Request, _res: Response, next: NextFunction): void => {
     // 2-1) 인증된 사용자 여부 확인, 인증되지 않은 경우 401 Unauthorized 에러 반환
