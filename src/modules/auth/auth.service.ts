@@ -332,7 +332,7 @@ class AuthService {
     return {
       access: ACCESS_TOKEN_COOKIE,
       refresh: REFRESH_TOKEN_COOKIE,
-      acessMaxAge: accessTokenMaxAgeMs,
+      accessMaxAge: accessTokenMaxAgeMs,
       refreshMaxAge: refreshTokenMaxAgeMs,
       accessCookieOptions,
       refreshCookieOptions,
