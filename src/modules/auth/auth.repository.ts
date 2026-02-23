@@ -23,7 +23,6 @@ import {
   UpdateAdminDto,
   UpdateApprovalStatusDto,
 } from './auth.dto';
-import { Sign } from 'node:crypto';
 
 // ==============================================
 // ⭐️ 인증 관련 레포지토리 정의
