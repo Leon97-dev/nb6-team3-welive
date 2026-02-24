@@ -37,7 +37,8 @@ jest.mock('../../dist/modules/auth/auth.token', () => ({
 }));
 
 const authService = require('../../dist/modules/auth/auth.service').default;
-const authRepository = require('../../dist/modules/auth/auth.repository').default;
+const authRepository =
+  require('../../dist/modules/auth/auth.repository').default;
 const authToken = require('../../dist/modules/auth/auth.token');
 
 describe('authService', () => {
@@ -88,7 +89,9 @@ describe('authService', () => {
     authToken.createAccessToken.mockReturnValueOnce('access-login-token');
 
     const req = {
-      get: jest.fn((name) => (name === 'user-agent' ? 'jest-agent' : undefined)),
+      get: jest.fn((name) =>
+        name === 'user-agent' ? 'jest-agent' : undefined
+      ),
       headers: {
         'x-forwarded-for': '10.1.2.3, 127.0.0.1',
       },
@@ -105,12 +108,12 @@ describe('authService', () => {
       {
         userAgent: 'jest-agent',
         ipAddress: '10.1.2.3',
-      },
+      }
     );
     expect(authRepository.updateSessionToken).toHaveBeenCalledWith(
       'session-1',
       'hash:refresh-login-token',
-      expect.any(Date),
+      expect.any(Date)
     );
     expect(authToken.createAccessToken).toHaveBeenCalledWith({
       sub: 'user-1',
@@ -166,7 +169,7 @@ describe('authService', () => {
 
   test('refresh throws when refresh token cookie is missing', async () => {
     await expect(authService.refresh({ cookies: {} })).rejects.toThrow(
-      '리프레시 토큰이 제공되지 않았습니다',
+      '리프레시 토큰이 제공되지 않았습니다'
     );
   });
 
@@ -176,7 +179,7 @@ describe('authService', () => {
     await expect(
       authService.refresh({
         cookies: { refresh_token: 'old-refresh-token' },
-      }),
+      })
     ).rejects.toThrow('유효한 세션이 존재하지 않습니다');
   });
 
@@ -189,7 +192,7 @@ describe('authService', () => {
     await expect(
       authService.refresh({
         cookies: { refresh_token: 'old-refresh-token' },
-      }),
+      })
     ).rejects.toThrow('리프레시 토큰이 유효하지 않습니다');
   });
 
@@ -203,7 +206,7 @@ describe('authService', () => {
     await expect(
       authService.refresh({
         cookies: { refresh_token: 'old-refresh-token' },
-      }),
+      })
     ).rejects.toThrow('사용자를 찾을 수 없습니다');
   });
 
@@ -230,7 +233,7 @@ describe('authService', () => {
     expect(authRepository.updateSessionToken).toHaveBeenCalledWith(
       'session-1',
       'hash:new-refresh-token',
-      expect.any(Date),
+      expect.any(Date)
     );
     expect(authToken.createAccessToken).toHaveBeenCalledWith({
       sub: 'user-1',
@@ -248,7 +251,7 @@ describe('authService', () => {
     const actor = { id: 'admin-2', role: 'ADMIN' };
 
     expect(() => authService.updateAdmin(actor, 'admin-1', {})).toThrow(
-      '관리자 정보 업데이트는 슈퍼 관리자만 수행할 수 있습니다',
+      '관리자 정보 업데이트는 슈퍼 관리자만 수행할 수 있습니다'
     );
   });
 
@@ -258,7 +261,9 @@ describe('authService', () => {
     const expected = { adminId: 'admin-1' };
     authRepository.updateAdmin.mockResolvedValue(expected);
 
-    await expect(authService.updateAdmin(actor, 'admin-1', payload)).resolves.toBe(expected);
+    await expect(
+      authService.updateAdmin(actor, 'admin-1', payload)
+    ).resolves.toBe(expected);
     expect(authRepository.updateAdmin).toHaveBeenCalledWith('admin-1', payload);
   });
 
@@ -267,30 +272,56 @@ describe('authService', () => {
     const adminActor = { id: 'admin-1', role: 'ADMIN', apartmentId: 'apt-1' };
     const payload = { status: 'APPROVED' };
 
-    authRepository.updateAdminStatus.mockResolvedValue({ adminId: 'a1', status: 'APPROVED' });
-    authRepository.updateAllAdminsStatus.mockResolvedValue({ updated: 3, status: 'APPROVED' });
-    authRepository.deleteAdmin.mockResolvedValue({ adminId: 'a1' });
-    authRepository.cleanupRejectedAdmins.mockResolvedValue({ cleaned: 2 });
-    authRepository.cleanupRejectedResidents.mockResolvedValue({ cleaned: 7 });
-    authRepository.updateResidentStatus.mockResolvedValue({ residentId: 'r1', status: 'APPROVED' });
-    authRepository.updateAllResidentsStatus.mockResolvedValue({ updated: 10, status: 'APPROVED' });
-
-    await expect(authService.updateAdminStatus(superActor, 'a1', payload)).resolves.toEqual({
+    authRepository.updateAdminStatus.mockResolvedValue({
       adminId: 'a1',
       status: 'APPROVED',
     });
-    await expect(authService.updateAllAdminsStatus(superActor, payload)).resolves.toEqual({
+    authRepository.updateAllAdminsStatus.mockResolvedValue({
       updated: 3,
       status: 'APPROVED',
     });
-    await expect(authService.deleteAdmin(superActor, 'a1')).resolves.toEqual({ adminId: 'a1' });
-    await expect(authService.cleanupRejectedAccounts(superActor)).resolves.toEqual({ cleaned: 2 });
-    await expect(authService.cleanupRejectedAccounts(adminActor)).resolves.toEqual({ cleaned: 7 });
-    await expect(authService.updateResidentStatus(adminActor, 'r1', payload)).resolves.toEqual({
+    authRepository.deleteAdmin.mockResolvedValue({ adminId: 'a1' });
+    authRepository.cleanupRejectedAdmins.mockResolvedValue({ cleaned: 2 });
+    authRepository.cleanupRejectedResidents.mockResolvedValue({ cleaned: 7 });
+    authRepository.updateResidentStatus.mockResolvedValue({
       residentId: 'r1',
       status: 'APPROVED',
     });
-    await expect(authService.updateAllResidentsStatus(adminActor, payload)).resolves.toEqual({
+    authRepository.updateAllResidentsStatus.mockResolvedValue({
+      updated: 10,
+      status: 'APPROVED',
+    });
+
+    await expect(
+      authService.updateAdminStatus(superActor, 'a1', payload)
+    ).resolves.toEqual({
+      adminId: 'a1',
+      status: 'APPROVED',
+    });
+    await expect(
+      authService.updateAllAdminsStatus(superActor, payload)
+    ).resolves.toEqual({
+      updated: 3,
+      status: 'APPROVED',
+    });
+    await expect(authService.deleteAdmin(superActor, 'a1')).resolves.toEqual({
+      adminId: 'a1',
+    });
+    await expect(
+      authService.cleanupRejectedAccounts(superActor)
+    ).resolves.toEqual({ cleaned: 2 });
+    await expect(
+      authService.cleanupRejectedAccounts(adminActor)
+    ).resolves.toEqual({ cleaned: 7 });
+    await expect(
+      authService.updateResidentStatus(adminActor, 'r1', payload)
+    ).resolves.toEqual({
+      residentId: 'r1',
+      status: 'APPROVED',
+    });
+    await expect(
+      authService.updateAllResidentsStatus(adminActor, payload)
+    ).resolves.toEqual({
       updated: 10,
       status: 'APPROVED',
     });
