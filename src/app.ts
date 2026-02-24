@@ -19,6 +19,7 @@ import healthRouter from './shared/health/health.route';
 import uploadRouter from './shared/upload/upload.route';
 import authRouter from './modules/auth/auth.routes';
 import userRouter from './modules/users/user.routes';
+import apartmentRouter from './modules/apartments/apartment.routes';
 
 // ======================================
 // ⭐️ 환경 설정
@@ -54,6 +55,7 @@ app.use('/api/upload', uploadRouter);
 // Domain Routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
+app.use('/api/apartments', apartmentRouter);
 
 // ======================================
 // ⭐️ 에러 핸들링
