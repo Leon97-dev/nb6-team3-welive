@@ -1,0 +1,55 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script_stop: true
+          envs: APP_DIR,APP_ENV
+          script: |
+            set -e
+
+            cd "${APP_DIR}"
+
+            git fetch origin
+            git checkout main
+            git pull origin main
+
+            if [ -n "${APP_ENV}" ]; then
+              printf "%s" "${APP_ENV}" > .env
+            fi
+
+            npm ci
+            npx prisma generate
+            npx prisma migrate deploy
+            npm run build
+
+            if pm2 describe welive > /dev/null; then
+              pm2 restart welive --update-env
+            else
+              pm2 start dist/server.js --name welive
+            fi
+
+            pm2 save
+        env:
+          APP_DIR: ${{ secrets.EC2_APP_DIR }}
+          APP_ENV: ${{ secrets.APP_ENV }}
