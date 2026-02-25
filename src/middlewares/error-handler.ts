@@ -90,14 +90,13 @@ export const errorHandler = (
   const isProd = process.env.NODE_ENV === 'production';
 
   // 8-A) winston 로깅 출력
-  logger.error('⚠️ 글로벌 에러 발생', {
+  logger.error(err.message || '서버 에러가 발생했습니다', {
     requestId: req.requestId,
-    message: err.message,
-    stack: err.stack,
     path: req.path,
     method: req.method,
     user: req.user?.id,
     code: err.code,
+    ...(err.isOperational ? {} : { stack: err.stack }),
   });
 
   // 8-B) 디버그 모드에서만 추가 상세 로그

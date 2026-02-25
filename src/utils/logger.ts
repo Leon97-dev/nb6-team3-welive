@@ -15,60 +15,75 @@ import { createLogger, format, transports } from 'winston';
 import type { TransformableInfo } from 'logform';
 import fs from 'fs';
 import path from 'path';
-import { ENV } from '../config/env';
 
-// 1) 로그 포맷 정의
+// 1) 로그 디렉토리 설정 및 생성
 const { combine, timestamp, printf, colorize, errors } = format;
-const logDir = path.join(process.cwd(), 'temp', 'logs');
+const logDir = path.join(process.cwd(), 'logs');
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
-// 2) 커스텀 로그 포맷: 타임스탬프, 레벨, 메시지, 스택 트레이스 포함
+// 2) 로그 포맷 정의 (인간 친화적)
+const humanReadableFormat = printf((info: TransformableInfo) => {
+  const {
+    level,
+    message,
+    timestamp: ts,
+    stack,
+    requestId,
+    method,
+    path,
+    user,
+    code,
+    ...meta
+  } = info as TransformableInfo & {
+    timestamp?: string;
+    stack?: string;
+    requestId?: string;
+    method?: string;
+    path?: string;
+    user?: string;
+    code?: string;
+  };
+
+  const contextParts = [
+    requestId ? `req=${requestId}` : '',
+    method ? method : '',
+    path ? path : '',
+    user ? `user=${user}` : '',
+    code ? `code=${code}` : '',
+  ].filter(Boolean);
+
+  const context = contextParts.length > 0 ? ` [${contextParts.join(' ')}]` : '';
+  const extraMeta =
+    Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
+  const base = `[${ts ?? ''}] ${level}:${context} ${String(message)}${extraMeta}`;
+
+  return stack ? `${base}\n${stack}` : base;
+});
+
+// 3) 로거 생성
 export const logger = createLogger({
-  // 2-1) 로그 레벨 설정 (환경변수 LOG_LEVEL 또는 기본 'info')
-  level: ENV.LOG_LEVEL,
-  // 2-2) 로그 포맷 설정
-  format: combine(
-    // 2-2-1) 에러 객체의 스택 트레이스 포함
-    errors({ stack: true }),
-    // 2-2-2) 타임스탬프 추가
-    timestamp(),
-    // 2-2-3) 커스텀 로그 메시지 포맷
-    printf((info: TransformableInfo) => {
-      // 2-2-3-1) 로그 정보에서 레벨, 메시지, 타임스탬프, 스택 트레이스, 기타 메타데이터 추출
-      const {
-        level,
-        message,
-        timestamp: ts,
-        stack,
-        ...meta
-      } = info as TransformableInfo & {
-        timestamp?: string;
-        stack?: string;
-      };
-      // 2-2-3-2) 메타데이터가 존재하면 JSON 문자열로 변환하여 로그 메시지에 포함
-      const rest = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-      // 2-2-3-3) 메시지를 문자열로 변환하여 로그 포맷에 맞게 출력 (스택 트레이스가 있으면 포함)
-      const msg = String(message);
-      // 2-2-3-4) 최종 로그 메시지 포맷: [타임스탬프] 레벨: 메시지 메타데이터 (스택 트레이스 포함)
-      return stack
-        ? `[${ts ?? ''}] ${level}: ${msg} ${rest}\n${stack}`
-        : `[${ts ?? ''}] ${level}: ${msg}${rest}`;
-    })
-  ),
-  // 2-3) 로그 출력 방식 설정: 콘솔 출력
+  level: process.env.LOG_LEVEL || 'info',
+  format: combine(errors({ stack: true })),
   transports: [
     new transports.Console({
-      format: combine(colorize(), timestamp(), errors({ stack: true })),
+      format: combine(
+        colorize({ all: true }),
+        timestamp(),
+        errors({ stack: true }),
+        humanReadableFormat
+      ),
     }),
     new transports.File({
-      filename: path.join(logDir, 'error.log'),
-      level: 'error',
-    }),
-    new transports.File({
-      filename: path.join(logDir, 'combined.log'),
+      filename: path.join(logDir, 'app.log'),
+      level: process.env.LOG_LEVEL || 'info',
+      format: combine(
+        timestamp(),
+        errors({ stack: true }),
+        humanReadableFormat
+      ),
     }),
   ],
 });
