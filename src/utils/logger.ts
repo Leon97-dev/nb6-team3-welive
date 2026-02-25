@@ -13,10 +13,17 @@
 
 import { createLogger, format, transports } from 'winston';
 import type { TransformableInfo } from 'logform';
+import fs from 'fs';
+import path from 'path';
 import { ENV } from '../config/env';
 
 // 1) 로그 포맷 정의
 const { combine, timestamp, printf, colorize, errors } = format;
+const logDir = path.join(process.cwd(), 'temp', 'logs');
+
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
 // 2) 커스텀 로그 포맷: 타임스탬프, 레벨, 메시지, 스택 트레이스 포함
 export const logger = createLogger({
@@ -55,6 +62,13 @@ export const logger = createLogger({
   transports: [
     new transports.Console({
       format: combine(colorize(), timestamp(), errors({ stack: true })),
+    }),
+    new transports.File({
+      filename: path.join(logDir, 'error.log'),
+      level: 'error',
+    }),
+    new transports.File({
+      filename: path.join(logDir, 'combined.log'),
     }),
   ],
 });
