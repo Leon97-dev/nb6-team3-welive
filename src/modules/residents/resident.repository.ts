@@ -1,5 +1,4 @@
 import {
-  ApprovalStatus,
   HouseholderType,
   ResidentOccupancyStatus,
   Role,
@@ -31,7 +30,11 @@ import {
   normalizeUnitNumber,
 } from './repository/normalizer';
 
-export const residentsRepository = {
+// ==============================================
+// ⭐️ 입주민 관련 Repository
+// ==============================================
+class ResidentRepository {
+  // 1) 입주민 목록 조회 (관리자용, 템플릿 CSV 다운로드)
   async list(query: ListResidentsQuery, actor: Express.UserContext) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 목록 조회 권한이 없습니다', 403);
@@ -185,8 +188,9 @@ export const residentsRepository = {
       count: residentRosters.length,
       message: '입주민 목록이 성공적으로 조회되었습니다.',
     };
-  },
+  }
 
+  // 2) 입주민 생성 (관리자용)
   async create(actor: Express.UserContext, payload: CreateResidentDto) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 등록 권한이 없습니다', 403);
@@ -273,8 +277,9 @@ export const residentsRepository = {
       }
       throw error;
     }
-  },
+  }
 
+  // 3) CSV로 입주민 일괄 등록 (관리자용)
   async importFromCsv(actor: Express.UserContext, filePath: string) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 파일 등록 권한이 없습니다', 403);
@@ -385,8 +390,9 @@ export const residentsRepository = {
       message: `${stats.created}명의 입주민이 등록되었습니다`,
       count: stats.created,
     };
-  },
+  }
 
+  // 4) 입주민 목록 CSV 다운로드 (관리자용)
   async downloadCsv(actor: Express.UserContext, query: ListResidentsQuery) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 명부 다운로드 권한이 없습니다', 403);
@@ -432,8 +438,9 @@ export const residentsRepository = {
     });
 
     return ['\uFEFF' + header.join(','), ...lines].join('\n');
-  },
+  }
 
+  // 5) 입주민 목록 조회 (관리자용, 템플릿 CSV 다운로드)
   getTemplateCsv() {
     const header = [
       'building',
@@ -450,8 +457,9 @@ export const residentsRepository = {
       sample1.join(','),
       sample2.join(','),
     ].join('\n');
-  },
+  }
 
+  // 6) 입주민 상세 조회 (관리자용)
   async createFromUser(actor: Express.UserContext, userId: string) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 등록 권한이 없습니다', 403);
@@ -564,8 +572,9 @@ export const residentsRepository = {
     });
 
     return toResidentRowFromRoster(resident);
-  },
+  }
 
+  // 7) 입주민 상세 조회 (관리자용)
   async getById(actor: Express.UserContext, residentId: string) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 조회 권한이 없습니다', 403);
@@ -630,8 +639,9 @@ export const residentsRepository = {
     }
 
     return toResidentRowFromUser(resident);
-  },
+  }
 
+  // 8) 입주민 정보 수정 (관리자용)
   async update(
     actor: Express.UserContext,
     residentId: string,
@@ -753,8 +763,9 @@ export const residentsRepository = {
     });
 
     return toResidentRowFromUser(updated);
-  },
+  }
 
+  // 9) 입주민 삭제 (관리자용)
   async remove(actor: Express.UserContext, residentId: string) {
     if (actor.role !== Role.ADMIN) {
       throw new AppError('입주민 삭제 권한이 없습니다', 403);
@@ -855,5 +866,7 @@ export const residentsRepository = {
     });
 
     return { message: '작업이 성공적으로 완료되었습니다' };
-  },
-};
+  }
+}
+
+export default new ResidentRepository();

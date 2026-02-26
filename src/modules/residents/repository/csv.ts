@@ -8,6 +8,10 @@ import {
   normalizeUnitNumber,
 } from './normalizer';
 
+// ==============================================
+// ⭐️ 입주민 관련 Utility
+// ==============================================
+// 1) CSV 행 타입 정의 (입주민 정보)
 export type CsvResidentRow = {
   building: string;
   unitNumber: string;
@@ -16,6 +20,7 @@ export type CsvResidentRow = {
   isHouseholder: HouseholderType;
 };
 
+// 2) CSV 헤더 별칭 정의 (다양한 헤더 이름 허용)
 const headerAliases: Record<
   keyof Omit<CsvResidentRow, 'isHouseholder'> | 'isHouseholder',
   string[]
@@ -33,6 +38,7 @@ const headerAliases: Record<
   ],
 };
 
+// 3) CSV 콘텐츠 파싱 함수 (입주민 정보 추출)
 export const parseResidentsCsv = (content: string): CsvResidentRow[] => {
   const normalized = content.replace(/^\uFEFF/, '').trim();
   if (!normalized) {

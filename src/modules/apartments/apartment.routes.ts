@@ -5,7 +5,7 @@ import asyncHandler from '../../middlewares/async-handler';
 const router = Router();
 
 // ==============================================
-// ⭐️ 아파트 관련 라우터 정의
+// ⭐️ 아파트 관련 라우터
 // ==============================================
 // 1) 아파트 목록 조회 (관리자용)
 router.get('/', asyncHandler(apartmentController.list));

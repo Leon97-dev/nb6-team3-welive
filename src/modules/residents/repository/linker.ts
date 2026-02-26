@@ -6,6 +6,10 @@ import {
 } from '@prisma/client';
 import { normalizeDigits } from './normalizer';
 
+// ==============================================
+// ⭐️ 입주민 관련 Utility
+// ==============================================
+// 1) 입주민과 사용자 연결 시도 (거주자 명부와 사용자 정보 매칭)
 export const tryLinkUserWithRoster = async (
   tx: Prisma.TransactionClient,
   roster: {

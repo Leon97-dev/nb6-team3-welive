@@ -4,12 +4,17 @@ import {
   ResidentOccupancyStatus,
 } from '@prisma/client';
 
+// ==============================================
+// ⭐️ 입주민 관련 Utility
+// ==============================================
+// 1) 입주민 거주 상태 매핑 정의
 const mapResidency = (status: ResidentOccupancyStatus) => {
   return status === ResidentOccupancyStatus.RESIDENCE
     ? 'RESIDENCE'
     : 'NO_RESIDENCE';
 };
 
+// 2) 입주민 목록 아이템 타입 정의
 export type ResidentListItem = {
   id: string;
   userId: string;
@@ -24,6 +29,7 @@ export type ResidentListItem = {
   residenceStatus: 'RESIDENCE' | 'NO_RESIDENCE';
 };
 
+// 3) 사용자 정보에서 입주민 목록 아이템으로 변환 함수
 export const toResidentRowFromUser = (user: {
   id: string;
   name: string;
@@ -48,6 +54,7 @@ export const toResidentRowFromUser = (user: {
   residenceStatus: 'RESIDENCE' as const,
 });
 
+// 4) 거주자 명부에서 입주민 목록 아이템으로 변환 함수
 export const toResidentRowFromRoster = (roster: {
   id: string;
   name: string;
