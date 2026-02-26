@@ -24,7 +24,7 @@ export const debugLog = (...args: unknown[]) => {
 /**
  * 2) debugError()
  * 에러 상황을 디버그 모드에서만 출력 (console.error)
- * error-handler.js 내부에서 활용
+ * error-handler.ts 내부에서 활용
  */
 export const debugError = (...args: unknown[]) => {
   if (isDebugMode()) {

@@ -1,5 +1,5 @@
 /**
- * @name Validation-Middleware
+ * @name Superstruct-Validation
  * @category Middleware
  * @description
  * Superstruct를 사용하여 요청의 body, query, params를 검증하는 미들웨어입니다.
@@ -47,7 +47,6 @@ export const validate =
 
       next();
     } catch (error) {
-      // 2-4) 검증 실패 시 에러 처리
       next(new ValidationError('잘못된 요청입니다'));
     }
   };

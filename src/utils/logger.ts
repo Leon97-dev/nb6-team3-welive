@@ -24,8 +24,9 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
-// 2) 로그 포맷 정의 (인간 친화적)
+// 2) 로그 포맷 정의
 const humanReadableFormat = printf((info: TransformableInfo) => {
+  // 2-1) 로그 정보 구조 분해
   const {
     level,
     message,
@@ -47,6 +48,7 @@ const humanReadableFormat = printf((info: TransformableInfo) => {
     code?: string;
   };
 
+  // 2-2) 로그 컨텍스트 구성
   const contextParts = [
     requestId ? `req=${requestId}` : '',
     method ? method : '',
@@ -55,18 +57,27 @@ const humanReadableFormat = printf((info: TransformableInfo) => {
     code ? `code=${code}` : '',
   ].filter(Boolean);
 
+  // 2-3) 최종 로그 메시지 구성
   const context = contextParts.length > 0 ? ` [${contextParts.join(' ')}]` : '';
+
+  // 2-4) 메타 정보가 있는 경우 JSON 문자열로 추가
   const extraMeta =
     Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
+
+  // 2-5) 최종 로그 메시지 구성 (스택 트레이스 포함)
   const base = `[${ts ?? ''}] ${level}:${context} ${String(message)}${extraMeta}`;
 
+  // 2-6) 스택 트레이스가 있는 경우 메시지에 포함하여 반환
   return stack ? `${base}\n${stack}` : base;
 });
 
 // 3) 로거 생성
 export const logger = createLogger({
+  // 3-1) 로그 레벨 설정: 환경변수 LOG_LEVEL 또는 기본값 'info'
   level: process.env.LOG_LEVEL || 'info',
+  // 3-2) 로그 포맷 설정: 타임스탬프, 에러 스택 포함, 인간 친화적 포맷
   format: combine(errors({ stack: true })),
+  // 3-3) 로그 출력 방식 설정: 콘솔과 파일
   transports: [
     new transports.Console({
       format: combine(

@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 
 // ==============================================
-// ⭐️ 역할 관련 유틸 함수
+// ⭐️ 역할 관련 Utility
 // ==============================================
 // 1) 관리자 역할 여부 확인
 export const isAdminRole = (role: Role): role is 'ADMIN' | 'SUPER_ADMIN' => {

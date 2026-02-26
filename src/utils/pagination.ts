@@ -1,5 +1,5 @@
 // ==============================================
-// ⭐️ 페이지네이션 유틸리티
+// ⭐️ 페이징 관련 Utility
 // ==============================================
 // 1) 문자열을 양의 정수로 파싱하는 함수
 export const parsePositiveInt = (
@@ -10,7 +10,7 @@ export const parsePositiveInt = (
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-// 2) 페이지네이션 입력과 옵션을 정의하는 인터페이스
+// 2) 페이징 입력과 옵션을 정의하는 인터페이스
 export interface ResolvePaginationInput {
   page?: string;
   limit?: string;
@@ -22,7 +22,7 @@ export interface ResolvePaginationOptions {
   maxLimit?: number;
 }
 
-// 3) 페이지네이션을 계산하는 함수
+// 3) 페이징을 계산하는 함수
 export const resolvePagination = (
   input: ResolvePaginationInput,
   options: ResolvePaginationOptions

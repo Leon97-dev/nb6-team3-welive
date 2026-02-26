@@ -1,5 +1,5 @@
 /**
- * @name RateLimit-Middleware
+ * @name Express-Rate-Limit
  * @category Middleware
  * @description
  * 클라이언트의 과도한 요청을 방지하기 위한 미들웨어입니다.

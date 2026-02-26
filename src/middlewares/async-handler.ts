@@ -11,12 +11,14 @@
 
 import type { NextFunction, Request, Response } from 'express';
 
+// 1) 비동기 컨트롤러 타입 정의
 type AsyncController = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => Promise<unknown> | unknown;
 
+// 2) asyncHandler 함수 정의
 const asyncHandler =
   (fn: AsyncController) =>
   (req: Request, res: Response, next: NextFunction) => {
