@@ -3,16 +3,27 @@ const { PrismaClient } = require('@prisma/client');
 const path = require('path');
 const dotenv = require('dotenv');
 
+// ==============================================
+// ⭐️ 시드 데이터 생성 로직 구현을 위한 유틸리티 및 설정
+// ==============================================
+// 1) .env 파일에서 환경 변수 로드
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
+// 2) Prisma 클라이언트 인스턴스 생성
 const prisma = new PrismaClient();
 
-const PASSWORD_PLAIN = 'test1234@';
+// 3) 시드 데이터에 사용할 기본 비밀번호 (모든 사용자에게 동일한 비밀번호 사용)
+const PASSWORD_PLAIN = 'welive1234@';
 
+// 4) 연락처 생성 함수 (010으로 시작하는 11자리 번호 생성)
 function makeContact(index) {
   return `010${String(10000000 + index).slice(-8)}`;
 }
 
+// ==============================================
+// ⭐️ 시드 데이터 생성 로직 구현을 위한 유틸리티 함수들
+// ==============================================
+// 1) 입주민과 거주자 명부 데이터를 생성하는 함수
 function createResidentSeedRows(apartmentId, adminsByBuilding, passwordHash) {
   const residents = [];
   const residentRosters = [];
@@ -52,7 +63,7 @@ function createResidentSeedRows(apartmentId, adminsByBuilding, passwordHash) {
           building: String(building),
           unitNumber,
           isHouseholder,
-          occupancyStatus: 'RESIDING',
+          residenceStatus: 'RESIDENCE',
           email,
         });
 
@@ -64,6 +75,7 @@ function createResidentSeedRows(apartmentId, adminsByBuilding, passwordHash) {
   return { residents, residentRosters };
 }
 
+// 2) 시드 데이터 생성 전에 기존 데이터를 모두 삭제하는 함수
 async function resetAllData() {
   await prisma.authSession.deleteMany();
   await prisma.notification.deleteMany();
@@ -80,11 +92,17 @@ async function resetAllData() {
   await prisma.user.deleteMany();
 }
 
+// ==============================================
+// ⭐️ 메인 시드 함수 - 데이터 생성 로직 구현
+// ==============================================
 async function main() {
+  // 1) 모든 사용자에게 동일한 비밀번호를 해시하여 저장
   const passwordHash = await bcrypt.hash(PASSWORD_PLAIN, 10);
 
+  // 2) 기존 데이터 삭제
   await resetAllData();
 
+  // 3) 최고 관리자 계정 생성
   const superAdmin = await prisma.user.create({
     data: {
       username: 'superadmin@test.com',
@@ -99,6 +117,7 @@ async function main() {
     },
   });
 
+  // 4) 아파트 단지 생성
   const apartment = await prisma.apartment.create({
     data: {
       name: '위리브 1단지',
@@ -117,12 +136,14 @@ async function main() {
     },
   });
 
+  // 5) 각 동별 관리자 계정 생성
   const adminRows = [
     { building: '101', email: 'admin101@test.com', name: '101동 관리자' },
     { building: '102', email: 'admin102@test.com', name: '102동 관리자' },
     { building: '103', email: 'admin103@test.com', name: '103동 관리자' },
   ];
 
+  // 6) 관리자 계정 생성 및 아파트 단지에 연결
   const admins = [];
   for (let i = 0; i < adminRows.length; i += 1) {
     const row = adminRows[i];
@@ -145,11 +166,13 @@ async function main() {
     admins.push(admin);
   }
 
+  // 7) 아파트 단지에 관리자 연결 (첫 번째 관리자를 대표 관리자(adminId)로 설정)
   await prisma.apartment.update({
     where: { id: apartment.id },
     data: { adminId: admins[0].id },
   });
 
+  // 8) 입주민과 거주자 명부 데이터 생성 및 저장
   const adminsByBuilding = Object.fromEntries(
     admins.map((admin) => [admin.building, admin])
   );
@@ -185,12 +208,13 @@ async function main() {
         building: rosterData.building,
         unitNumber: rosterData.unitNumber,
         isHouseholder: rosterData.isHouseholder,
-        occupancyStatus: rosterData.occupancyStatus,
+        residenceStatus: rosterData.residenceStatus,
         userId: usersByEmail[rosterData.email]?.id ?? null,
       },
     });
   }
 
+  // 9) 공지사항 게시판 생성
   const noticeBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -199,6 +223,7 @@ async function main() {
     },
   });
 
+  // 10) 민원 게시판 생성
   const complaintBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -207,6 +232,7 @@ async function main() {
     },
   });
 
+  // 11) 주민투표 게시판 생성
   const pollBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -215,6 +241,7 @@ async function main() {
     },
   });
 
+  // 12) 투표 게시판에 투표 2개 생성 (1개는 진행 중, 1개는 종료)
   const pollInProgress = await prisma.poll.create({
     data: {
       apartmentId: apartment.id,
@@ -230,6 +257,7 @@ async function main() {
     },
   });
 
+  // 13) 종료된 투표는 7일 전에 시작해서 7일 전에 종료되도록 설정
   const pollClosed = await prisma.poll.create({
     data: {
       apartmentId: apartment.id,
@@ -245,6 +273,7 @@ async function main() {
     },
   });
 
+  // 14) 각 투표에 2개의 선택지 생성
   const [poll1OptYes, poll1OptNo] = await Promise.all([
     prisma.pollOption.create({
       data: { pollId: pollInProgress.id, title: '찬성', sortOrder: 1 },
@@ -254,6 +283,7 @@ async function main() {
     }),
   ]);
 
+  // 15) 종료된 투표는 찬성/반대 대신 일정 동의/연기 선택지로 생성
   const [poll2OptAgree, poll2OptDelay] = await Promise.all([
     prisma.pollOption.create({
       data: { pollId: pollClosed.id, title: '일정 동의', sortOrder: 1 },
@@ -263,6 +293,7 @@ async function main() {
     }),
   ]);
 
+  // 16) 각 투표에 2명씩 투표 참여 (총 4명, 중복 없이)
   const userSampleA = usersByEmail['user101-101@test.com'];
   const userSampleB = usersByEmail['user102-101@test.com'];
   const userSampleC = usersByEmail['user103-102@test.com'];
@@ -315,6 +346,7 @@ async function main() {
     data: { voteCount: 1 },
   });
 
+  // 17) 일반 공지사항 생성
   const noticeGeneral = await prisma.notice.create({
     data: {
       apartmentId: apartment.id,
@@ -329,6 +361,7 @@ async function main() {
     },
   });
 
+  // 18) 투표 결과에 따른 공지사항 생성 (투표 종료 후 일정 확정 공지)
   const noticeFromPoll = await prisma.notice.create({
     data: {
       apartmentId: apartment.id,
@@ -356,6 +389,7 @@ async function main() {
     },
   });
 
+  // 19) 처리 중인 민원 생성 (민원 등록 후 2일 뒤에 처리 중으로 변경된 것으로 설정)
   const complaintOpen = await prisma.complaint.create({
     data: {
       apartmentId: apartment.id,
@@ -372,6 +406,7 @@ async function main() {
     },
   });
 
+  // 20) 처리 완료된 민원 생성 (민원 등록 후 3일 뒤에 처리 완료로 변경된 것으로 설정)
   const complaintDone = await prisma.complaint.create({
     data: {
       apartmentId: apartment.id,
@@ -469,6 +504,7 @@ async function main() {
     ],
   });
 
+  // 20) 생성된 데이터 개수 출력
   const residentCount = await prisma.user.count({
     where: { role: 'USER', apartmentId: apartment.id },
   });
@@ -476,12 +512,21 @@ async function main() {
     where: { role: 'ADMIN', apartmentId: apartment.id },
   });
 
-  console.log('Seed complete');
-  console.log(`Super Admin: superadmin@test.com / ${PASSWORD_PLAIN}`);
+  // 21) 시드 완료 메시지 출력 및 주요 정보 안내
+  console.log(
+    '===================🏠[Seed Complete]==========================='
+  );
+  console.log(`Super Admin: ${superAdmin.email} / ${PASSWORD_PLAIN}`);
   console.log(`Apartment: ${apartment.name}`);
   console.log(`Admins: ${adminCount}, Residents: ${residentCount}`);
+  console.log(
+    '==============================================================='
+  );
 }
 
+// ==============================================
+// ⭐️ 시드 스크립트 실행 및 에러 핸들링
+// ==============================================
 main()
   .catch((error) => {
     console.error('Seed failed:', error);
