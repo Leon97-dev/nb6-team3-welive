@@ -3,7 +3,7 @@
  * @category Config
  * @description
  * Multer는 Express.js에서 파일 업로드를 처리하기 위한 미들웨어입니다.
- * 이 모듈에서는 Multer의 저장 방식, 파일 필터링, 크기 제한 등을 설정하여
+ * 이 모듈에서는 Multer의 저장 방식, 파일 필터링, 크기 제한 등을 설정하여,
  * 안전하고 효율적인 파일 업로드 기능을 제공합니다.
  * 업로드된 파일은 서버의 지정된 폴더에 저장되며, 파일 이름은 랜덤하게 생성됩니다.
  * @see https://www.npmjs.com/package/multer
@@ -45,7 +45,7 @@ const storage = multer.diskStorage({
     const validExt = ['.jpg', '.jpeg', '.png', '.pdf', '.csv'].includes(ext)
       ? ext
       : '';
-    // 5-3) 랜덤 문자열로` 반환: 중복 해결
+    // 5-3) 랜덤 문자열로 파일 이름 생성: 중복 해결
     cb(null, crypto.randomUUID() + validExt);
     // 다른 방식도 가능
     // `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
