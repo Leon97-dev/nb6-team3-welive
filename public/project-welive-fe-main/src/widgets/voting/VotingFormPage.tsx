@@ -11,7 +11,7 @@ import { VotingDetail } from '@/entities/voting/type';
 import { postCreateVoting, patchUpdateVoting, PollStatus } from '@/entities/voting/api/voting.api';
 import { useAuthStore } from '@/shared/store/auth.store';
 import { useRouter } from 'next/router';
-import { getApartmentDetail } from '@/entities/apartment/api/apartment.api';
+import { getPublicApartmentDetail } from '@/entities/apartment/api/apartment.api';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { votingFormSchema } from '@/entities/voting/schema/voting.schema';
@@ -67,7 +67,7 @@ export default function VotingFormPage({ isEdit = false, initialData }: Props) {
     const fetchDongOptions = async () => {
       if (!apartmentId) return;
       try {
-        const data = await getApartmentDetail(apartmentId);
+        const data = await getPublicApartmentDetail(apartmentId);
         const options: { value: string; label: string }[] = [];
         for (
           let complex = Number(data.startComplexNumber);
@@ -97,15 +97,26 @@ export default function VotingFormPage({ isEdit = false, initialData }: Props) {
       return;
     }
     try {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+      const now = new Date();
+
+      const derivedStatus =
+        now < startDate
+          ? PollStatus.PENDING
+          : now <= endDate
+            ? PollStatus.IN_PROGRESS
+            : PollStatus.CLOSED;
+
       const payload = {
         boardId,
-        status: PollStatus.PENDING,
+        status: derivedStatus,
         title: formData.title,
         content: formData.content,
         buildingPermission:
           formData.buildingPermission === 'all' ? 0 : Number(formData.buildingPermission),
-        startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         options: formData.options.filter((opt) => opt.enabled).map((opt) => ({ title: opt.value })),
       };
 

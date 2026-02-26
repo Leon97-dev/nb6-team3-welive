@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import DeleteModal from '@/shared/DeleteModal';
 import DetailNoticeCommentForm from '@/entities/notice/ui/detail/DetailNoticeCommentForm';
@@ -21,9 +21,12 @@ export default function DetailAdminNoticePage() {
   const { id } = router.query;
   const comments = data?.comments ?? [];
   const user = useAuthStore((state) => state.user);
+  const fetchedNoticeIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || typeof id !== 'string') return;
+    if (fetchedNoticeIdRef.current === id) return;
+    fetchedNoticeIdRef.current = id;
     const fetchData = async () => {
       try {
         const response = await axiosInstance.get(`/notices/${id}`);

@@ -1,5 +1,12 @@
 export const formatDateToKST = (dateStr: string) => {
-  const date = new Date(dateStr.replace(' ', 'T') + 'Z');
+  if (!dateStr) return '-';
+
+  // ISO(예: 2026-02-23T08:54:38.395Z)와 공백 포맷(예: 2026-02-23 08:54:38) 모두 허용
+  const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) return '-';
+
   return date
     .toLocaleString('ko-KR', {
       timeZone: 'Asia/Seoul',

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { fetchResidentNoticeDetail } from '@/entities/notice/api/noticeApi';
 import CommentSection from '@/shared/comments/ui/CommentSection';
@@ -36,9 +36,12 @@ export default function DetailResidentNoticePage() {
   const router = useRouter();
   const { id: noticeId } = router.query;
   const [notice, setNotice] = useState<NoticeDetail | null>(null);
+  const fetchedNoticeIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!noticeId || typeof noticeId !== 'string') return;
+    if (fetchedNoticeIdRef.current === noticeId) return;
+    fetchedNoticeIdRef.current = noticeId;
 
     const fetchData = async () => {
       try {

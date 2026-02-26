@@ -47,7 +47,7 @@ export default function Navibar() {
   async function handleLogout() {
     try {
       const res = await axiosInstance.post('/auth/logout');
-      if (res.status === 200 || res.status === 201) {
+      if (res.status >= 200 && res.status < 300) {
         clearUser();
         router.replace('/');
       } else {
@@ -76,7 +76,17 @@ export default function Navibar() {
 
     eventSource.addEventListener('alarm', (event) => {
       try {
-        const newNotifications: Notification[] = JSON.parse(event.data);
+        const parsed = JSON.parse(event.data) as
+          | Notification[]
+          | { type?: string; data?: Notification[] | Notification };
+        const newNotifications = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed?.data)
+            ? parsed.data
+            : parsed?.data
+              ? [parsed.data]
+              : [];
+
         setNotifications((prev) => {
           const existingIds = new Set(prev.map((n) => n.notificationId));
           const filtered = newNotifications.filter((n) => !existingIds.has(n.notificationId));

@@ -3,7 +3,7 @@ import Title from '@/shared/Title';
 import CivilMeta from './CivilMeta';
 import CivilContent from './CivilContent';
 import Select from '@/shared/Select';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from '@/shared/lib/axios';
 import CommentSection from '@/shared/comments/ui/CommentSection';
 import { useAuthStore } from '@/shared/store/auth.store';
@@ -36,9 +36,12 @@ export default function CivilViewPage() {
   };
 
   const [complaint, setComplaint] = useState<ComplaintDetail | null>(null);
+  const fetchedComplaintIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!id || typeof id !== 'string') return;
+    if (fetchedComplaintIdRef.current === id) return;
+    fetchedComplaintIdRef.current = id;
 
     const fetchComplaint = async () => {
       try {

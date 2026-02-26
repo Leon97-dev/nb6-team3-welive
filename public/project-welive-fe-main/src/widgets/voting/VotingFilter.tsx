@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuthStore } from '@/shared/store/auth.store';
-import { getApartmentDetail } from '@/entities/apartment/api/apartment.api';
+import { getPublicApartmentDetail } from '@/entities/apartment/api/apartment.api';
 import { useState, useEffect } from 'react';
 import { PollStatus } from '@/entities/voting/api/voting.api';
 
@@ -36,7 +36,7 @@ export default function VotingFilter({ onSearchKeyword, onChangeStatus, onChange
       if (!apartmentId) return;
 
       try {
-        const data = await getApartmentDetail(apartmentId);
+        const data = await getPublicApartmentDetail(apartmentId);
         const { startComplexNumber, endComplexNumber, startDongNumber, endDongNumber } = data;
 
         const complexStart = parseInt(startComplexNumber, 10);

@@ -39,8 +39,8 @@ enum HouseholderType {
 
 // 세대원 거주 상태
 enum ResidentOccupancyStatus {
-  RESIDING // 거주 중
-  MOVED_OUT // 이사 나감
+  RESIDENCE // 거주 중
+  NO_RESIDENCE // 이사 나감
 }
 
 // 민원 상태
@@ -199,7 +199,7 @@ model ResidentRoster {
   building        String
   unitNumber      String
   isHouseholder   HouseholderType
-  occupancyStatus ResidentOccupancyStatus @default(RESIDING)
+  residenceStatus ResidentOccupancyStatus @default(RESIDENCE)
 
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -210,7 +210,7 @@ model ResidentRoster {
 
   @@unique([apartmentId, building, unitNumber, name, contact])
   @@index([apartmentId, building, unitNumber])
-  @@index([occupancyStatus])
+  @@index([residenceStatus])
 }
 
 // 게시판 (공지사항, 투표, 민원)
@@ -435,10 +435,10 @@ model AuthSession {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   refreshTokenHash String
-  userAgent        String?
-  ipAddress        String?
-  expiresAt        DateTime
-  revokedAt        DateTime?
+  userAgent        String? // 클라이언트 정보 (선택적)
+  ipAddress        String? // 클라이언트 IP (선택적)
+  expiresAt        DateTime // 세션 만료 시간
+  revokedAt        DateTime? // 세션이 취소된 시간 (취소되지 않은 경우 null)
 
   createdAt DateTime @default(now())
 

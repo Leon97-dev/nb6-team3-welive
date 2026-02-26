@@ -41,7 +41,8 @@ export default function VotingSelector({
 
   const permission = buildingPermission.toString().padStart(4, '0');
   const dong = Number(residentDong).toString().padStart(4, '0');
-  const canVote = role !== 'USER' ? true : buildingPermission === 0 || permission === dong;
+  const isResident = role === 'USER';
+  const canVote = isResident && (buildingPermission === 0 || permission === dong);
 
   const endDate = new Date(endAt);
   const isUnavailable = status !== 'IN_PROGRESS';
@@ -98,6 +99,7 @@ export default function VotingSelector({
 
   // 투표 버튼 라벨 및 disabled 상태 계산
   const voteButtonLable = (() => {
+    if (!isResident) return '입주민 계정만 투표할 수 있습니다';
     if (!canVote) return '투표 권한이 없습니다';
     if (isUnavailable) return '투표 기간이 아닙니다';
     if (submitting) return '처리 중';
