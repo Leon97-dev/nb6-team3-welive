@@ -22,7 +22,7 @@ const allowedOrigins = new Set(
     // 2-1) .env에서 명시한 프론트 주소
     process.env.CLIENT_URL || 'http://localhost:3000',
     // 2-2) 개발용 주소(필요 시 로컬에서 다른 포트 프론트도 허용)
-    'http://127.0.0.1:3000',
+    'http://localhost:3001',
     // 2-3) 같은 포트에서 테스트할 때를 위한 fallback
     process.env.BASE_URL || 'http://localhost:3000',
   ]
