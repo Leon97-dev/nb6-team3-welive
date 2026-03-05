@@ -22,6 +22,7 @@ import userRouter from './modules/users/user.routes';
 import apartmentRouter from './modules/apartments/apartment.routes';
 import commentRouter from './modules/comments/comments.routes';
 import complaintRouter from './modules/complaints/complaints.routes';
+import eventRouter from './modules/event/event.routes';
 
 // ======================================
 // ⭐️ 환경 설정
@@ -60,6 +61,7 @@ app.use('/api/users', userRouter);
 app.use('/api/apartments', apartmentRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/complaints', complaintRouter);
+app.use('/api/event', eventRouter);
 
 // ======================================
 // ⭐️ 에러 핸들링
