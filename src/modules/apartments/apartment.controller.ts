@@ -3,7 +3,7 @@ import apartmentService from './apartment.service';
 import type { ListApartmentsQuery } from './apartment.dto';
 
 // ==============================================
-// ⭐️ 아파트 관련 컨트롤러 정의
+// ⭐️ 아파트 관련 Controller
 // ==============================================
 class ApartmentController {
   // 1) 아파트 목록 조회 (관리자용)

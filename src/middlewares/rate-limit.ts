@@ -18,10 +18,10 @@ const limiter = rateLimit({
   // 1-1) 시간 제한: 1분
   windowMs: 60 * 1000,
   // 1-2) 갯수 제한: 최대 100회
-  max: 100,
+  max: 10,
   // 1-3) 초과 시 에러
   handler: (_req, _res, next) =>
-    next(new AppError('요청이 너무 많아 잠시 후 다시 시도해주세요', 429)),
+    next(new AppError('잠시 후 다시 시도해주세요', 429)),
 });
 
 // 2) 최종 요청 제한 인스턴스

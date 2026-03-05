@@ -4,9 +4,9 @@ import type { ListApartmentsQuery } from './apartment.dto';
 import apartmentRepository from './apartment.repository';
 
 // ==============================================
-// ⭐️ 아파트 관련 서비스 정의
+// ⭐️ 아파트 관련 Service
 // ==============================================
-class ApartmentsService {
+class ApartmentService {
   // 1) 아파트 목록 조회 (관리자용)
   list(query: ListApartmentsQuery, actor?: Express.UserContext) {
     // 1-1) 일반 사용자 또는 관리자는 자신의 아파트 정보만 조회할 수 있도록 apartmentId를 설정
@@ -42,4 +42,4 @@ class ApartmentsService {
   }
 }
 
-export default new ApartmentsService();
+export default new ApartmentService();

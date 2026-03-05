@@ -5,7 +5,7 @@ import { resolvePagination } from '../../utils/pagination';
 import type { ListApartmentsQuery } from './apartment.dto';
 
 // ==============================================
-// ⭐️ 아파트 관련 데이터베이스 접근 로직
+// ⭐️ 아파트 관련 Utility
 // ==============================================
 // 1) 데이터베이스에서 아파트 정보를 직렬화하는 함수
 const serializeApartment = (apartment: {
@@ -47,7 +47,7 @@ const serializeApartment = (apartment: {
 });
 
 // ================================================
-// ⭐️ 아파트 관련 레포지토리 정의
+// ⭐️ 아파트 관련 Repository
 // ================================================
 class ApartmentRepository {
   // 1) 아파트 목록 조회 (관리자용)

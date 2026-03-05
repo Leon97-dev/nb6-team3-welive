@@ -7,7 +7,7 @@ import { requireAuth, requireRoles } from '../../middlewares/auth';
 const router = Router();
 
 // ==============================================
-// ⭐️ 인증 관련 라우터 정의
+// ⭐️ 인증 관련 Router
 // ==============================================
 // 1) 일반 유저 가입
 router.post('/signup', asyncHandler(authController.signupUser));

@@ -4,7 +4,7 @@ import { ENV } from '../../config/env';
 import type { Role } from '@prisma/client';
 
 // ===============================================
-// ⭐️ 토큰 상수 및 유틸리티 함수 정의
+// ⭐️ 토큰 관련 Utility
 // ===============================================
 // 1) 토큰 이름 상수 정의 (재사용 편의성)
 export const ACCESS_TOKEN_COOKIE = 'access_token';
@@ -64,7 +64,7 @@ const accessExpiresIn = asExpiresIn(ENV.ACCESS_EXPIRES_IN);
 const refreshExpiresIn = asExpiresIn(ENV.REFRESH_EXPIRES_IN);
 
 // ==============================================
-// ⭐️ 토큰 생성 및 검증 함수 정의
+// ⭐️ 토큰 생성 및 검증 Functions
 // ==============================================
 // 1) 액세스 토큰 생성 함수 (페이로드와 시크릿을 사용하여 JWT 생성)
 export const createAccessToken = (payload: AccessTokenPayload): string =>

@@ -1,7 +1,8 @@
 ### 환경 설정
-@base = http://localhost:3000
-@adminId =
-@residentId =
+@base=http://localhost:3000
+@superAdminId=cmmd7iv660007qyny7z02z1a5
+@adminId=cmmd7b8mc0000qynydukn1ui6
+@residentId=
 
 ### 1) 일반 유저 가입
 POST {{base}}/api/auth/signup
@@ -24,12 +25,12 @@ POST {{base}}/api/auth/signup/admin
 Content-Type: application/json
 
 {
-  "username": "admin_test_001",
+  "username": "admin_test_011",
   "password": "AdminTest1234!",
   "passwordConfirm": "AdminTest1234!",
-  "contact": "01023456789",
-  "name": "관리자",
-  "email": "admin_test_001@example.com",
+  "contact": "01023456781",
+  "name": "관리자123",
+  "email": "admin_test_011@example.com",
   "apartmentName": "위리브 1단지",
   "apartmentAddress": "서울시 강남구 테헤란로 1",
   "apartmentManagementNumber": "0212345678",
@@ -50,7 +51,7 @@ POST {{base}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin_test_001",
+  "username": "admin_test_012",
   "password": "AdminTest1234!"
 }
 
@@ -95,7 +96,7 @@ x-user-role: SUPER_ADMIN
 ### 8) 관리자 가입 승인 상태 변경 (슈퍼 관리자 권한)
 PATCH {{base}}/api/auth/admins/{{adminId}}/status
 Content-Type: application/json
-x-user-id: super-user-1
+x-user-id: {{superAdminId}}
 x-user-role: SUPER_ADMIN
 
 {

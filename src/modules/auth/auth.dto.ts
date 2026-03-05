@@ -1,7 +1,7 @@
 import type { Role } from '@prisma/client';
 
 // ==============================================
-// ⭐️ 인증 관련 DTO (Data Transfer Object) 정의
+// ⭐️ 인증 관련 DTO
 // ==============================================
 // 1) 가입 승인 상태 타입 정의 (가입 승인 상태를 나타내는 문자열 리터럴 타입)
 export type ApprovalStatus = 'APPROVED' | 'REJECTED';
