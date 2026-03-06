@@ -1,7 +1,7 @@
 ### 환경 설정
 @base=http://localhost:3000
-@superAdminId=cmmd7iv660007qyny7z02z1a5
-@adminId=cmmd7b8mc0000qynydukn1ui6
+@superAdminId=
+@adminId=cmmefviha0000qycti1gfnzak
 @residentId=
 
 ### 1) 일반 유저 가입
@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
   "username": "user_test_001",
-  "password": "UserTest1234!",
+  "password": "user1234!",
   "contact": "01012345678",
   "name": "일반유저",
   "email": "user_test_001@example.com",
@@ -25,9 +25,9 @@ POST {{base}}/api/auth/signup/admin
 Content-Type: application/json
 
 {
-  "username": "admin_test_011",
-  "password": "AdminTest1234!",
-  "passwordConfirm": "AdminTest1234!",
+  "username": "admin_test_012",
+  "password": "admin1234!",
+  "passwordConfirm": "admin1234!",
   "contact": "01023456781",
   "name": "관리자123",
   "email": "admin_test_011@example.com",
@@ -52,7 +52,7 @@ Content-Type: application/json
 
 {
   "username": "admin_test_012",
-  "password": "AdminTest1234!"
+  "password": "admin1234!"
 }
 
 ### 4) 토큰 재발급 (login 이후 쿠키 필요)
@@ -69,7 +69,7 @@ x-user-role: SUPER_ADMIN
 
 {
   "username": "super_test_001",
-  "password": "SuperTest1234!",
+  "password": "super1234!",
   "contact": "01034567890",
   "name": "슈퍼관리자",
   "email": "super_test_001@example.com",
