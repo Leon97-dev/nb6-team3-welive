@@ -37,20 +37,16 @@ export default function VotingFilter({ onSearchKeyword, onChangeStatus, onChange
 
       try {
         const data = await getPublicApartmentDetail(apartmentId);
-        const { startComplexNumber, endComplexNumber, startDongNumber, endDongNumber } = data;
+        const { startDongNumber, endDongNumber } = data;
 
-        const complexStart = parseInt(startComplexNumber, 10);
-        const complexEnd = parseInt(endComplexNumber, 10);
         const dongStart = parseInt(startDongNumber, 10);
         const dongEnd = parseInt(endDongNumber, 10);
 
         const result: OptionType[] = [{ value: '-1', label: '전체' }];
 
-        for (let complex = complexStart; complex <= complexEnd; complex++) {
-          for (let dong = dongStart; dong <= dongEnd; dong++) {
-            const dongNumber = `${complex}${dong.toString().padStart(2, '0')}`;
-            result.push({ value: dongNumber, label: `${dongNumber}동` });
-          }
+        for (let dong = dongStart; dong <= dongEnd; dong++) {
+          const dongNumber = String(dong);
+          result.push({ value: dongNumber, label: `${dongNumber}동` });
         }
 
         setDongOptions(result);

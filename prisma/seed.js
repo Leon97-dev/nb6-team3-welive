@@ -24,7 +24,7 @@ function makeContact(index) {
 // ⭐️ 시드 데이터 생성 로직 구현을 위한 유틸리티 함수들
 // ==============================================
 // 1) 입주민과 거주자 명부 데이터를 생성하는 함수
-function createResidentSeedRows(apartmentId, adminsByBuilding, passwordHash) {
+function createResidentSeedRows(apartmentId, approverId, passwordHash) {
   const residents = [];
   const residentRosters = [];
 
@@ -51,7 +51,7 @@ function createResidentSeedRows(apartmentId, adminsByBuilding, passwordHash) {
           building: String(building),
           unitNumber,
           apartmentId,
-          approvedById: adminsByBuilding[String(building)].id,
+          approvedById: approverId,
           approvedAt: new Date(),
         };
         residents.push(resident);
@@ -136,49 +136,33 @@ async function main() {
     },
   });
 
-  // 5) 각 동별 관리자 계정 생성
-  const adminRows = [
-    { building: '101', email: 'admin101@test.com', name: '101동 관리자' },
-    { building: '102', email: 'admin102@test.com', name: '102동 관리자' },
-    { building: '103', email: 'admin103@test.com', name: '103동 관리자' },
-  ];
-
-  // 6) 관리자 계정 생성 및 아파트 단지에 연결
-  const admins = [];
-  for (let i = 0; i < adminRows.length; i += 1) {
-    const row = adminRows[i];
-    const admin = await prisma.user.create({
-      data: {
-        username: row.email,
-        email: row.email,
-        passwordHash,
-        name: row.name,
-        contact: makeContact(700 + i),
-        role: 'ADMIN',
-        approvalStatus: 'APPROVED',
-        isRegistered: true,
-        apartmentId: apartment.id,
-        building: row.building,
-        approvedById: superAdmin.id,
-        approvedAt: new Date(),
-      },
-    });
-    admins.push(admin);
-  }
-
-  // 7) 아파트 단지에 관리자 연결 (첫 번째 관리자를 대표 관리자(adminId)로 설정)
-  await prisma.apartment.update({
-    where: { id: apartment.id },
-    data: { adminId: admins[0].id },
+  // 5) 아파트 단지 관리자 계정 생성 (단지당 1명)
+  const admin = await prisma.user.create({
+    data: {
+      username: 'admin101@test.com',
+      email: 'admin101@test.com',
+      passwordHash,
+      name: '1단지 관리자',
+      contact: makeContact(700),
+      role: 'ADMIN',
+      approvalStatus: 'APPROVED',
+      isRegistered: true,
+      apartmentId: apartment.id,
+      approvedById: superAdmin.id,
+      approvedAt: new Date(),
+    },
   });
 
-  // 8) 입주민과 거주자 명부 데이터 생성 및 저장
-  const adminsByBuilding = Object.fromEntries(
-    admins.map((admin) => [admin.building, admin])
-  );
+  // 6) 아파트 단지 대표 관리자(adminId) 연결
+  await prisma.apartment.update({
+    where: { id: apartment.id },
+    data: { adminId: admin.id },
+  });
+
+  // 7) 입주민과 거주자 명부 데이터 생성 및 저장
   const { residents, residentRosters } = createResidentSeedRows(
     apartment.id,
-    adminsByBuilding,
+    admin.id,
     passwordHash
   );
 
@@ -214,7 +198,7 @@ async function main() {
     });
   }
 
-  // 9) 공지사항 게시판 생성
+  // 8) 공지사항 게시판 생성
   const noticeBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -223,7 +207,7 @@ async function main() {
     },
   });
 
-  // 10) 민원 게시판 생성
+  // 9) 민원 게시판 생성
   const complaintBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -232,7 +216,7 @@ async function main() {
     },
   });
 
-  // 11) 주민투표 게시판 생성
+  // 10) 주민투표 게시판 생성
   const pollBoard = await prisma.board.create({
     data: {
       apartmentId: apartment.id,
@@ -241,12 +225,12 @@ async function main() {
     },
   });
 
-  // 12) 투표 게시판에 투표 2개 생성 (1개는 진행 중, 1개는 종료)
+  // 11) 투표 게시판에 투표 2개 생성 (1개는 진행 중, 1개는 종료)
   const pollInProgress = await prisma.poll.create({
     data: {
       apartmentId: apartment.id,
       boardId: pollBoard.id,
-      authorId: admins[0].id,
+      authorId: admin.id,
       title: '단지 내 헬스장 운영시간 연장 찬반',
       content: '헬스장 운영시간을 1시간 연장하는 안건입니다.',
       status: 'IN_PROGRESS',
@@ -257,12 +241,12 @@ async function main() {
     },
   });
 
-  // 13) 종료된 투표는 7일 전에 시작해서 7일 전에 종료되도록 설정
+  // 12) 종료된 투표는 7일 전에 시작해서 7일 전에 종료되도록 설정
   const pollClosed = await prisma.poll.create({
     data: {
       apartmentId: apartment.id,
       boardId: pollBoard.id,
-      authorId: admins[1].id,
+      authorId: admin.id,
       title: '102동 엘리베이터 교체 일정 동의',
       content: '102동 엘리베이터 교체 공사 일정을 확정합니다.',
       status: 'CLOSED',
@@ -273,7 +257,7 @@ async function main() {
     },
   });
 
-  // 14) 각 투표에 2개의 선택지 생성
+  // 13) 각 투표에 2개의 선택지 생성
   const [poll1OptYes, poll1OptNo] = await Promise.all([
     prisma.pollOption.create({
       data: { pollId: pollInProgress.id, title: '찬성', sortOrder: 1 },
@@ -283,7 +267,7 @@ async function main() {
     }),
   ]);
 
-  // 15) 종료된 투표는 찬성/반대 대신 일정 동의/연기 선택지로 생성
+  // 14) 종료된 투표는 찬성/반대 대신 일정 동의/연기 선택지로 생성
   const [poll2OptAgree, poll2OptDelay] = await Promise.all([
     prisma.pollOption.create({
       data: { pollId: pollClosed.id, title: '일정 동의', sortOrder: 1 },
@@ -293,7 +277,7 @@ async function main() {
     }),
   ]);
 
-  // 16) 각 투표에 2명씩 투표 참여 (총 4명, 중복 없이)
+  // 15) 각 투표에 2명씩 투표 참여 (총 4명, 중복 없이)
   const userSampleA = usersByEmail['user101-101@test.com'];
   const userSampleB = usersByEmail['user102-101@test.com'];
   const userSampleC = usersByEmail['user103-102@test.com'];
@@ -346,11 +330,11 @@ async function main() {
     data: { voteCount: 1 },
   });
 
-  // 17) 일반 공지사항 생성
+  // 16) 일반 공지사항 생성
   const noticeGeneral = await prisma.notice.create({
     data: {
       apartmentId: apartment.id,
-      authorId: admins[0].id,
+      authorId: admin.id,
       title: '소방 안전 점검 안내',
       content: '이번 주 금요일 오전 10시부터 소방 안전 점검이 진행됩니다.',
       category: 'MAINTENANCE',
@@ -361,11 +345,11 @@ async function main() {
     },
   });
 
-  // 18) 투표 결과에 따른 공지사항 생성 (투표 종료 후 일정 확정 공지)
+  // 17) 투표 결과에 따른 공지사항 생성 (투표 종료 후 일정 확정 공지)
   const noticeFromPoll = await prisma.notice.create({
     data: {
       apartmentId: apartment.id,
-      authorId: admins[1].id,
+      authorId: admin.id,
       title: '102동 엘리베이터 교체 일정 확정',
       content: '투표 결과에 따라 102동 엘리베이터 교체 일정이 확정되었습니다.',
       category: 'RESIDENT_VOTE',
@@ -385,11 +369,11 @@ async function main() {
       endDate: new Date(
         Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000
       ),
-      createdById: admins[0].id,
+      createdById: admin.id,
     },
   });
 
-  // 19) 처리 중인 민원 생성 (민원 등록 후 2일 뒤에 처리 중으로 변경된 것으로 설정)
+  // 18) 처리 중인 민원 생성 (민원 등록 후 2일 뒤에 처리 중으로 변경된 것으로 설정)
   const complaintOpen = await prisma.complaint.create({
     data: {
       apartmentId: apartment.id,
@@ -406,7 +390,7 @@ async function main() {
     },
   });
 
-  // 20) 처리 완료된 민원 생성 (민원 등록 후 3일 뒤에 처리 완료로 변경된 것으로 설정)
+  // 19) 처리 완료된 민원 생성 (민원 등록 후 3일 뒤에 처리 완료로 변경된 것으로 설정)
   const complaintDone = await prisma.complaint.create({
     data: {
       apartmentId: apartment.id,
@@ -436,7 +420,7 @@ async function main() {
         apartmentId: apartment.id,
         boardType: 'COMPLAINT',
         boardId: complaintOpen.id,
-        authorId: admins[0].id,
+        authorId: admin.id,
         content: '현장 확인 후 오늘 내 처리 예정입니다.',
       },
       {
@@ -459,14 +443,14 @@ async function main() {
         isRead: false,
       },
       {
-        receiverId: admins[0].id,
+        receiverId: admin.id,
         type: 'RESIDENT_SIGNUP_REQUESTED',
         title: '입주민 가입 요청',
         message: '새 입주민 가입 요청이 있습니다.',
         isRead: false,
       },
       {
-        receiverId: admins[0].id,
+        receiverId: admin.id,
         type: 'COMPLAINT_CREATED',
         title: '신규 민원 등록',
         message: '주차장 조명 수리 요청 민원이 접수되었습니다.',

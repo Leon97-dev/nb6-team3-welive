@@ -10,8 +10,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema } from '@/entities/profile/schema/profile.schema';
 import { patchChangeProfile } from '@/entities/profile/api/profile.api';
+import { postLogout } from '@/entities/auth/api/logout.api';
 import { z } from 'zod';
 import { isAxiosError, AxiosError } from 'axios';
+import Cookies from 'js-cookie';
 
 export default function ProfileForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,7 @@ export default function ProfileForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const userData = useAuthStore((state) => state.user);
+  const clearUser = useAuthStore((state) => state.clearUser);
 
   const {
     register,
@@ -50,6 +53,25 @@ export default function ProfileForm() {
         newPassword,
         file: selectedFile ?? undefined,
       });
+
+      // 비밀번호/프로필 변경 후에는 기존 인증 세션을 정리하고 재로그인 유도
+      try {
+        await postLogout();
+      } catch {}
+      clearUser();
+      // 서버 로그아웃 실패/지연에도 재로그인 막힘이 없도록 클라이언트 쿠키 강제 제거
+      Cookies.remove('access_token', { path: '/' });
+      Cookies.remove('refresh_token', { path: '/' });
+      if (process.env.NEXT_PUBLIC_DOMAIN) {
+        Cookies.remove('access_token', {
+          path: '/',
+          domain: process.env.NEXT_PUBLIC_DOMAIN,
+        });
+        Cookies.remove('refresh_token', {
+          path: '/',
+          domain: process.env.NEXT_PUBLIC_DOMAIN,
+        });
+      }
 
       alert('프로필이 성공적으로 수정되었습니다. 다시 로그인해주세요.');
       window.location.href = '/';

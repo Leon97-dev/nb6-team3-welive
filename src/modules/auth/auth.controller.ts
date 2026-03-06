@@ -78,7 +78,6 @@ class AuthController {
 
   // 4) 로그인 처리 함수 정의
   async login(req: Request, res: Response) {
-    ensureGuest(req);
     const payload = validateLogin(req.body);
     const { user, accessToken, refreshToken } = await authService.login(
       payload,

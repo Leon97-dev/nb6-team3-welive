@@ -32,11 +32,11 @@ router.post('/logout', requireAuth, asyncHandler(authController.logout));
 // 6) 토큰 재발급
 router.post('/refresh', asyncHandler(authController.refresh));
 
-// 7) 관리자 정보 업데이트
+// 7) 모든 관리자 가입 승인 상태 일괄 업데이트
 router.patch(
-  '/admins/:adminId',
+  '/admins/status',
   requireAuth,
-  asyncHandler(authController.updateAdmin)
+  asyncHandler(authController.updateAllAdminsStatus)
 );
 
 // 8) 관리자 가입 승인 상태 업데이트
@@ -46,11 +46,11 @@ router.patch(
   asyncHandler(authController.updateAdminStatus)
 );
 
-// 9) 모든 관리자 가입 승인 상태 일괄 업데이트
+// 9) 관리자 정보 업데이트
 router.patch(
-  '/admins/status',
+  '/admins/:adminId',
   requireAuth,
-  asyncHandler(authController.updateAllAdminsStatus)
+  asyncHandler(authController.updateAdmin)
 );
 
 // 10) 관리자 삭제

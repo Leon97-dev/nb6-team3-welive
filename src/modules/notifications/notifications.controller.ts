@@ -13,7 +13,7 @@ class NotificationController {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    res.setHeader('Content-Type', 'text/event-stream: charset=utf-8');
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
 

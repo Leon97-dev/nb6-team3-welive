@@ -70,18 +70,12 @@ export default function VotingFormPage({ isEdit = false, initialData }: Props) {
         const data = await getPublicApartmentDetail(apartmentId);
         const options: { value: string; label: string }[] = [];
         for (
-          let complex = Number(data.startComplexNumber);
-          complex <= Number(data.endComplexNumber);
-          complex++
+          let dong = Number(data.startDongNumber);
+          dong <= Number(data.endDongNumber);
+          dong++
         ) {
-          for (
-            let dong = Number(data.startDongNumber);
-            dong <= Number(data.endDongNumber);
-            dong++
-          ) {
-            const code = `${complex}${dong.toString().padStart(2, '0')}`;
-            options.push({ value: code, label: `${code}동` });
-          }
+          const code = String(dong);
+          options.push({ value: code, label: `${code}동` });
         }
         setDongOptions(options);
       } catch (error) {
