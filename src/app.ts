@@ -25,6 +25,7 @@ import complaintRouter from './modules/complaints/complaints.routes';
 import eventRouter from './modules/event/event.routes';
 import noticeRouter from './modules/notices/notices.routes';
 import notificationRouter from './modules/notifications/notifications.routes';
+import pollRouter from './modules/polls/polls.routes';
 
 // ======================================
 // ⭐️ 환경 설정
@@ -66,6 +67,8 @@ app.use('/api/complaints', complaintRouter);
 app.use('/api/event', eventRouter);
 app.use('/api/notices', noticeRouter);
 app.use('/api/notifications', notificationRouter);
+app.use('/api/polls', pollRouter);
+app.use('/api/options', pollRouter); // 투표 옵션 라우터도 pollRouter에서 처리
 
 // ======================================
 // ⭐️ 에러 핸들링
