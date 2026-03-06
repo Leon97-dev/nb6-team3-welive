@@ -8,6 +8,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      ACCESS_SECRET: ci-access-secret
+      REFRESH_SECRET: ci-refresh-secret
 
     steps:
       - name: Checkout
