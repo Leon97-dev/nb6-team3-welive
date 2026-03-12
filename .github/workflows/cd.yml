@@ -45,7 +45,8 @@ jobs:
               printf "%s" "${APP_ENV}" > .env
             fi
 
-            docker compose -f deploy/docker-compose.prod.yml down
+            docker compose -f deploy/docker-compose.prod.yml down --remove-orphans || true
+            docker rm -f welive || true
             docker compose -f deploy/docker-compose.prod.yml up -d --build
         env:
           APP_DIR: ${{ secrets.EC2_APP_DIR }}
