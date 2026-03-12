@@ -1,9 +1,9 @@
 services:
-  welive:
+  backend:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: welive
+    container_name: welive-backend
     restart: unless-stopped
     env_file:
       - ../.env
@@ -11,3 +11,17 @@ services:
       - "3000:3000"
     volumes:
       - ../public/uploads:/app/public/uploads
+
+  frontend:
+    build:
+      context: ../public/project-welive-fe-main
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: /api
+    container_name: welive-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: /api
+      NODE_ENV: production
+    ports:
+      - "3001:3000"
