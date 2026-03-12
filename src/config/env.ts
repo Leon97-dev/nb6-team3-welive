@@ -122,5 +122,12 @@ export const ENV = {
 export const env = {
   nodeEnv: ENV.NODE_ENV,
   port: ENV.PORT,
+  baseUrl: process.env.BASE_URL || 'http://localhost:3000',
   clientOrigin: process.env.CLIENT_URL || 'http://localhost:3000',
+  cookieSecure:
+    process.env.COOKIE_SECURE === 'true' ||
+    (process.env.COOKIE_SECURE !== 'false' &&
+      (process.env.CLIENT_URL || process.env.BASE_URL || '').startsWith(
+        'https://'
+      )),
 };

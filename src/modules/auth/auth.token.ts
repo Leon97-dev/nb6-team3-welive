@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { ENV } from '../../config/env';
+import { ENV, env } from '../../config/env';
 import type { Role } from '@prisma/client';
 
 // ===============================================
@@ -94,7 +94,7 @@ export const hashToken = (token: string): string =>
 // ⭐️ 쿠키 옵션 정의 (보안 및 유연성 고려)
 // ==============================================
 // 1) 보안 설정 (프로덕션 환경에서는 secure 옵션 활성화)
-const secure = ENV.NODE_ENV === 'production';
+const secure = env.cookieSecure;
 
 // 2) 액세스 토큰 쿠키 옵션 정의 (HTTPOnly, Secure, SameSite 설정)
 export const accessCookieOptions = {
