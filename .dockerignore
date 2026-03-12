@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.github
+.next
+coverage
+logs
+temp
+public/project-welive-fe-main
+npm-debug.log
+yarn-error.log
+.DS_Store

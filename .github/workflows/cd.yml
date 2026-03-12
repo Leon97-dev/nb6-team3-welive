@@ -7,6 +7,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     if: >
@@ -38,18 +45,8 @@ jobs:
               printf "%s" "${APP_ENV}" > .env
             fi
 
-            npm ci
-            npx prisma generate
-            npx prisma migrate deploy
-            npm run build
-
-            if pm2 describe welive > /dev/null; then
-              pm2 restart welive --update-env
-            else
-              pm2 start dist/server.js --name welive
-            fi
-
-            pm2 save
+            docker compose -f deploy/docker-compose.prod.yml down
+            docker compose -f deploy/docker-compose.prod.yml up -d --build
         env:
           APP_DIR: ${{ secrets.EC2_APP_DIR }}
           APP_ENV: ${{ secrets.APP_ENV }}
