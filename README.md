@@ -172,3 +172,14 @@ sudo systemctl restart nginx
 - 프론트와 백엔드 도메인이 다르면 `CLIENT_URL`, CORS 설정, 쿠키 정책 확인
 - HTTPS 적용 시 `certbot` 또는 AWS ALB/ACM 구성 권장
 - 업로드 파일은 `public/uploads` 볼륨으로 유지되도록 구성됨
+
+#### 베포 URL
+
+http://ec2-3-38-133-96.ap-northeast-2.compute.amazonaws.com
+
+#### seed 계정
+
+- 비밀번호 공통: welive1234@
+- 슈퍼관리자 계정: superadmin@test.com
+- 관리자 계정: admin101@test.com
+- 일반 계정: user101-101@test.com ~ user103-103@test.com
