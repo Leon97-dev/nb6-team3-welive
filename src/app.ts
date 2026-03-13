@@ -28,6 +28,7 @@ import notificationRouter from './modules/notifications/notifications.routes';
 import pollRouter from './modules/polls/polls.routes';
 import pollSchedulerRouter from './modules/poll-scheduler/poll-scheduler.routes';
 import residentRouter from './modules/residents/resident.routes';
+import docsRouter from './docs/docs.route';
 
 // ======================================
 // ⭐️ 환경 설정
@@ -57,6 +58,7 @@ app.use(
 // ⭐️ 라우터 등록 (추가시 여기에)
 // ======================================
 // Shared Routes
+app.use('/', docsRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/upload', uploadRouter);
 
